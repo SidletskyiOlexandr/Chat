@@ -11,7 +11,10 @@ namespace Chat.Infrastructure.Entities
         
         public string SenderId { get; set; }
         public User Sender { get; set; }
-        public int GroupId { get; set; }
-        public Group Group { get; set; }
+        public int? GroupId { get; set; }
+        public Group? Group { get; set; }
+
+        public int? PrivateChatId { get; set; }
+        public PrivateChat? PrivateChat { get; set; }
     }
 }

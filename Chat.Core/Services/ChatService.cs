@@ -110,21 +110,20 @@ namespace Chat.Core.Services
                     {
                         Id = x.GroupId,
                         Name = x.Group.Name,
-                        //ChatTypeId = Enum.TryParse(ChatTypes.GroupChat, out int),
                         ChatTypeId = (int)ChatTypes.GroupChat,
-                        LastMessageText = (x.Group.Messages.Count>0)? 
+                        LastMessageText = (x.Group.Messages.Count > 0) ?
                             x.Group.Messages
                                 .OrderByDescending(y => y.CreatedAt)
                                 .First()
-                                .Text 
+                                .Text
                                 : "",
-                        
-                        LastMessageCreatedAt = (x.Group.Messages.Count > 0) 
+
+                        LastMessageCreatedAt = (x.Group.Messages.Count > 0)
                             ? x.Group.Messages.
                             OrderByDescending(y => y.CreatedAt)
                             .First()
-                            .CreatedAt: 
-                            x.Group.CreatedAt 
+                            .CreatedAt :
+                            x.Group.CreatedAt
                     })
                 .ToListAsync();
 
@@ -154,7 +153,7 @@ namespace Chat.Core.Services
                 .ToListAsync();
 
             groups.AddRange(privateChats);
-            groups.OrderBy(x => x.LastMessageCreatedAt);
+            groups = groups.OrderByDescending(x => x.LastMessageCreatedAt).ToList();
 
             return groups;
         }
