@@ -23,7 +23,6 @@ namespace Chat.Core.Services
         private readonly IRepository<PrivateChat> _privateChatRepository;
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
-        //private readonly ChatTypes chatTypes = ChatTypes.
 
         public ChatService(
             UserManager<User> userManager,
@@ -153,9 +152,8 @@ namespace Chat.Core.Services
                 .ToListAsync();
 
             groups.AddRange(privateChats);
-            groups = groups.OrderByDescending(x => x.LastMessageCreatedAt).ToList();
 
-            return groups;
+            return groups.OrderByDescending(x => x.LastMessageCreatedAt).ToList();
         }
     }
 }

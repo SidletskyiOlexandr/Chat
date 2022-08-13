@@ -15,6 +15,7 @@ namespace Chat.Core
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthentificationService, AuthentificationService>();
             services.AddScoped<IChatService, ChatService>();
+            services.AddScoped<IMessageService, MessageService>();
             services.AddRepositories();
             services.AddDbContext(connectionString);
             services.AddIdentityDbContext();
