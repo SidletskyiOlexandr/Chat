@@ -1,6 +1,4 @@
-﻿
-
-namespace Chat.Common.DTOs
+﻿namespace Chat.Common.DTOs.UserDTOs
 {
     public class UserAutorizationDTO
     {

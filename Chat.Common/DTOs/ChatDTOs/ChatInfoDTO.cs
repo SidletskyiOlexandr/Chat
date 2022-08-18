@@ -1,7 +1,6 @@
-﻿
-using System;
+﻿using System;
 
-namespace Chat.Common.DTOs
+namespace Chat.Common.DTOs.ChatDTOs
 {
     public class ChatInfoDTO
     {

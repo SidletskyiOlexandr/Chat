@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Chat.Common.DTOs;
 using Chat.Core.Exceptions;
 using Chat.Core.Interfaces.Services;
 using Chat.Infrastructure.Entities;
@@ -11,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Chat.Core.ChatTypesEnum;
 using System;
+using Chat.Common.DTOs.ChatDTOs;
 
 namespace Chat.Core.Services
 {
@@ -44,7 +44,7 @@ namespace Chat.Core.Services
         public async Task CreateGroup(GroupCreateDTO groupCreateDTO, string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            
+
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.NotFound, "User not found");
 
@@ -77,22 +77,34 @@ namespace Chat.Core.Services
             if (user == null || toUser == null)
                 throw new HttpException(System.Net.HttpStatusCode.NotFound, "User not found");
 
+            var chatExist = await _userPrivateChatRepository
+                .Query()
+                .Where(x => x.UserId == userId || x.UserId == toUser.Id)
+                .GroupBy(x => x.PrivateChatId)
+                .AnyAsync(x => x.Count() > 1);
+
+            if (chatExist)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Chat already exist");
+
             var privateChat = new PrivateChat()
             {
-                Name = privateChatCreateDTO.Name
+                Name = privateChatCreateDTO.Name,
+                UserPrivateChats = new List<UserPrivateChat>()
+                {
+                    new UserPrivateChat()
+                    {
+                        UserId = user.Id
+                    },
+
+                    new UserPrivateChat()
+                    {
+                        UserId = toUser.Id
+                    },
+                }
             };
 
             await _privateChatRepository.AddAsync(privateChat);
             await _privateChatRepository.SaveChangesAsync();
-
-            var userPrivateChat = new UserPrivateChat()
-            {
-                PrivateChatId = privateChat.Id,
-                UserId = user.Id
-            };
-
-            await _userPrivateChatRepository.AddAsync(userPrivateChat);
-            await _userPrivateChatRepository.SaveChangesAsync();
 
             await Task.CompletedTask;
         }
@@ -154,6 +166,33 @@ namespace Chat.Core.Services
             groups.AddRange(privateChats);
 
             return groups.OrderByDescending(x => x.LastMessageCreatedAt).ToList();
+        }
+
+        public async Task AddChatMembersAsync(AddChatMemberDTO addChatMemberDTO, string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            var chat = _groupRepository.GetByKeyAsync(addChatMemberDTO.ChatId).Result;
+
+            if (user == null || chat == null)
+                throw new HttpException(System.Net.HttpStatusCode.NotFound, "Not found");
+            else if (userId != chat.CreatorId )
+                throw new HttpException(System.Net.HttpStatusCode.Forbidden, "Only group creator can add user");
+
+            foreach (var item in addChatMemberDTO.MembersEmailToAdd)
+            {
+                var groupMember = _userManager.FindByEmailAsync(item).Result;
+                var userGroup = new UserGroup()
+                {
+                    UserId = userId,
+                    User = groupMember,
+                    GroupId = addChatMemberDTO.ChatId,
+                    Group = chat
+                };
+
+                await _userGroupRepository.AddAsync(userGroup);
+            }
+
+            await _userGroupRepository.SaveChangesAsync();
         }
     }
 }
