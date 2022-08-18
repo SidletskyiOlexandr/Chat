@@ -1,4 +1,4 @@
-﻿using Chat.Common.DTOs;
+﻿using Chat.Common.DTOs.UserDTOs;
 using Chat.Core.Interfaces.Services;
 using Chat.Infrastructure.Entities;
 using Microsoft.AspNetCore.Authorization;

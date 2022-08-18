@@ -1,4 +1,4 @@
-﻿using Chat.Common.DTOs;
+﻿using Chat.Common.DTOs.MessageDTOs;
 using Chat.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -24,6 +24,14 @@ namespace Chat.WebApi.Controllers
             await _messageService.CreateMessage(messageDTO, UserId);
 
             return Ok();
+        }
+
+        [HttpGet("messages")]
+        public async Task<IActionResult> GetMessageListAsync(int chatId, int chatType)
+        {
+            var messages = await _messageService.GetMessagesAsync(UserId, chatId, chatType);
+            
+            return Ok(messages);
         }
 
     }

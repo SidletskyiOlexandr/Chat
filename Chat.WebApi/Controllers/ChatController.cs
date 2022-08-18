@@ -1,4 +1,4 @@
-﻿using Chat.Common.DTOs;
+﻿using Chat.Common.DTOs.ChatDTOs;
 using Chat.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -19,7 +19,7 @@ namespace Chat.WebApi.Controllers
         private string UserId => User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
         [HttpPost("group")]
-        public async Task<IActionResult> CreateGroup(GroupCreateDTO groupCreateDTO)
+        public async Task<IActionResult> CreateGroupAsync(GroupCreateDTO groupCreateDTO)
         {
             await _chatService.CreateGroup(groupCreateDTO, UserId);
 
@@ -27,7 +27,7 @@ namespace Chat.WebApi.Controllers
         }
 
         [HttpPost("privateChat")]
-        public async Task<IActionResult> CreatePrivateChat(PrivateChatCreateDTO privateChatCreateDTO)
+        public async Task<IActionResult> CreatePrivateChatAsync(PrivateChatCreateDTO privateChatCreateDTO)
         {
             await _chatService.CreatePrivateChat(privateChatCreateDTO, UserId);
 
@@ -35,11 +35,17 @@ namespace Chat.WebApi.Controllers
         }
 
         [HttpGet("chats")]
-        public async Task<IActionResult> GetChats()
+        public async Task<IActionResult> GetChatsAsync()
         {
             var chats = await _chatService.GetAllChats(UserId);
             
             return Ok(chats);
+        }
+        [HttpPut("members")]
+        public async Task<IActionResult> AddChatMembersAsync(AddChatMemberDTO addChatMemberDTO)
+        {
+            await _chatService.AddChatMembersAsync(addChatMemberDTO, UserId);
+            return Ok();
         }
     }
 }

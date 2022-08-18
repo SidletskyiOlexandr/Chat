@@ -1,4 +1,4 @@
-﻿namespace Chat.Common.DTOs
+﻿namespace Chat.Common.DTOs.MessageDTOs
 {
     public class MessageCreateDTO
     {

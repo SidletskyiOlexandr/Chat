@@ -1,4 +1,4 @@
-﻿using Chat.Common.DTOs;
+﻿using Chat.Common.DTOs.UserDTOs;
 using Chat.Core.Exceptions;
 using Chat.Core.Helpers;
 using Chat.Core.Interfaces.Services;
@@ -66,9 +66,6 @@ namespace Chat.Core.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),
             };
-
-            //var roles = _userManager.GetRolesAsync(user).Result;
-            //claims.AddRange(roles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Value.Secret));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

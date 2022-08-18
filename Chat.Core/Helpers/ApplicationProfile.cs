@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Chat.Common.DTOs;
+using Chat.Common.DTOs.MessageDTOs;
 using Chat.Infrastructure.Entities;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,11 @@ namespace Chat.Core.Helpers
     {
         public ApplicationProfile()
         {
-
+            CreateMap<Message, MessageInfoDTO>()
+                .ForMember(dest => dest.Id, act => act.MapFrom(src => src.Id))
+                .ForMember(dest => dest.SenderId, act => act.MapFrom(src => src.SenderId))
+                .ForMember(dest => dest.Text, act => act.MapFrom(src => src.Text))
+                .ForMember(dest => dest.CreatedAt, act => act.MapFrom(src => src.CreatedAt));
         }
     }
 }
