@@ -29,6 +29,7 @@ namespace Chat.WebApi
             services.ConfigJwtOptions(Configuration.GetSection("JwtOptions"));
             services.AddJwtAuthentication(Configuration);
             services.AddSwagger();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,6 +47,13 @@ namespace Chat.WebApi
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseRouting();
+
+            app.UseCors(c =>
+            {
+                c.AllowAnyOrigin();
+                c.AllowAnyHeader();
+                c.AllowAnyMethod();
+            });
 
             app.UseAuthentication();
             app.UseAuthorization();

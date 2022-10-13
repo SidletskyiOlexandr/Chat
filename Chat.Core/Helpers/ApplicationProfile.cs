@@ -19,5 +19,7 @@ namespace Chat.Core.Helpers
                 .ForMember(dest => dest.Text, act => act.MapFrom(src => src.Text))
                 .ForMember(dest => dest.CreatedAt, act => act.MapFrom(src => src.CreatedAt));
         }
+
+
     }
 }

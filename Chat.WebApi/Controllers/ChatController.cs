@@ -38,9 +38,18 @@ namespace Chat.WebApi.Controllers
         public async Task<IActionResult> GetChatsAsync()
         {
             var chats = await _chatService.GetAllChats(UserId);
-            
+
             return Ok(chats);
         }
+
+        [HttpGet("members")]
+        public async Task<IActionResult> GetAllChatMembersAsync(int chatId, int chatType)
+        {
+            var chatMembers = await _chatService.GetAllChatMembersAsync(chatId, chatType, UserId);
+
+            return Ok(chatMembers);
+        }
+
         [HttpPut("members")]
         public async Task<IActionResult> AddChatMembersAsync(AddChatMemberDTO addChatMemberDTO)
         {

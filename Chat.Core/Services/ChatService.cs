@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Chat.Core.ChatTypesEnum;
 using System;
 using Chat.Common.DTOs.ChatDTOs;
+using Chat.Common.DTOs.UserDTOs;
 
 namespace Chat.Core.Services
 {
@@ -166,6 +167,65 @@ namespace Chat.Core.Services
             groups.AddRange(privateChats);
 
             return groups.OrderByDescending(x => x.LastMessageCreatedAt).ToList();
+        }
+
+        public async Task<List<UserInfoDTO>> GetAllChatMembersAsync(int chatId, int chatType, string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new HttpException(System.Net.HttpStatusCode.NotFound, "User not found");
+
+            if (chatType == (int)ChatTypes.PrivateChat)
+            {
+                var chat = await _privateChatRepository.GetByKeyAsync(chatId) 
+                    ?? throw new HttpException(System.Net.HttpStatusCode.NotFound, "chat not found");
+
+                var isChatMember = chat.UserPrivateChats.Where(x => x.UserId == userId).FirstOrDefault()
+                    ?? throw new HttpException(System.Net.HttpStatusCode.Forbidden, "You are not chat member");
+
+                var chats = await _privateChatRepository.Query()
+                    .Where(x => x.Id == chatId)
+                    .Include(x => x.UserPrivateChats)
+                        .ThenInclude(x => x.User)
+                    .FirstOrDefaultAsync();
+
+                var members = chats.UserPrivateChats
+                    .Select(x => new UserInfoDTO()
+                    {
+                        Id = x.UserId,
+                        Email = x.User.Email,
+                        UserName = x.User.UserName,
+                    }).ToList();
+
+                return members;
+            }
+            else
+            {
+                var chat = await _groupRepository.Query()
+                    .Where(x => x.Id == chatId)
+                    .Include(x => x.UserGroups)
+                    .FirstOrDefaultAsync()
+                    ?? throw new HttpException(System.Net.HttpStatusCode.NotFound, "chat not found");
+
+                var isChatMember = chat.UserGroups.Where(x => x.UserId == userId).FirstOrDefault()
+                    ?? throw new HttpException(System.Net.HttpStatusCode.Forbidden, "You are not chat member");
+
+                var chats = await _groupRepository.Query()
+                    .Where(x => x.Id == chatId)
+                    .Include(x => x.UserGroups)
+                        .ThenInclude(x => x.User)
+                    .FirstOrDefaultAsync();
+                
+                var members = chats.UserGroups
+                    .Select(x => new UserInfoDTO()
+                    {
+                        Id = x.UserId,
+                        Email = x.User.Email,
+                        UserName = x.User.UserName,
+                    }).ToList();
+
+                return members;
+            }
         }
 
         public async Task AddChatMembersAsync(AddChatMemberDTO addChatMemberDTO, string userId)
